@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShrtX | Minimalist URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+.logo {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+
+    /* 1. Background Gradient */
+    background: linear-gradient(to right, #818cf8, #c084fc);
+
+    /* 2. Clipping (Standard + Vendor Prefix) */
+    -webkit-background-clip: text; /* For Chrome, Safari, Edge */
+    background-clip: text;         /* Standard property */
+
+    /* 3. Text Transparency */
+    -webkit-text-fill-color: transparent; /* Webkit browsers */
+    color: transparent;                   /* Standard fallback */
+}
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Section */
+        .result-card {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .result-header {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .result-link-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .result-link {
+            color: #34d399;
+            text-decoration: none;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .error-msg {
+            color: #fb7185;
+            font-size: 14px;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <div class="logo">ShrtX</div>
+            <div class="subtitle">Enter a long URL to make it tiny</div>
+        </div>
+
+        <div class="input-wrapper">
+            <input type="url" id="urlInput" placeholder="https://example.com/very-long-link" autocomplete="off">
+            <button id="btnText" onclick="shorten()">
+                <span id="btnLabel">Shorten URL</span>
+                <div id="loader" class="spinner"></div>
+            </button>
+        </div>
+
+        <div id="errorBox" class="error-msg"></div>
+
+        <div id="resultBox" class="result-card">
+            <div class="result-header">
+                <span>Success!</span>
+                <span style="cursor:pointer" onclick="copyToClipboard()" id="copyStatus">Copy</span>
+            </div>
+            <div class="result-link-wrapper">
+                <a href="#" id="shortUrl" target="_blank" class="result-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Crafted with <strong>Laravel</strong> &bull; Open API
+    </div>
+</div>
+
+<script>
+async function shorten() {
+    const input = document.getElementById('urlInput');
+    const resultBox = document.getElementById('resultBox');
+    const errorBox = document.getElementById('errorBox');
+    const shortUrlAnchor = document.getElementById('shortUrl');
+    const btnLabel = document.getElementById('btnLabel');
+    const loader = document.getElementById('loader');
+
+    const url = input.value.trim();
+
+    // Reset UI
+    resultBox.style.display = 'none';
+    errorBox.style.display = 'none';
+    
+    if (!url) {
+        showError('Please paste a link first');
+        return;
+    }
+
+    // Set Loading State
+    btnLabel.style.display = 'none';
+    loader.style.display = 'block';
+
+    try {
+        const res = await fetch('https://appsaral.alwaysdata.net/shrtx/api/shorten', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ url })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message || 'Validation failed');
+        }
+
+        shortUrlAnchor.innerText = data.short_url;
+        shortUrlAnchor.href = data.short_url;
+        resultBox.style.display = 'block';
+
+    } catch (e) {
+        showError(e.message || 'Network connection failed');
+    } finally {
+        btnLabel.style.display = 'block';
+        loader.style.display = 'none';
+    }
+}
+
+function showError(msg) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.innerText = msg;
+    errorBox.style.display = 'block';
+}
+
+function copyToClipboard() {
+    const text = document.getElementById('shortUrl').innerText;
+    const status = document.getElementById('copyStatus');
+    
+    navigator.clipboard.writeText(text).then(() => {
+        status.innerText = 'Copied!';
+        status.style.color = '#fff';
+        setTimeout(() => {
+            status.innerText = 'Copy';
+            status.style.color = '#10b981';
+        }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
